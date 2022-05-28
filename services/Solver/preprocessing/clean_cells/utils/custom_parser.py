@@ -5,10 +5,24 @@ class CustomParser:
 
     @staticmethod
     def parse(input_str):
-        matches = finditer('.+?(?:((?<=[0-9])st|nd|rd|th)|(?<=[0-9])(?=[A-Z])|(?<=[0-9])(?=[a-z])|$)', input_str)
+        
+        #matches = finditer('.+?(?:((?<=[0-9])st|nd|rd|th)|(?<=[0-9])(?=[A-Z])|(?<=[0-9])(?=[a-z])|$)', input_str)
+        matches = finditer('.+?(?:((?<=[0-9])(st|nd|rd|th))|(?<=[0-9])(?=[A-Z])|(?<=[0-9])(?=[a-z])|$)', input_str)
         intermediate = ' '.join([m.group(0) for m in matches])
         matches = finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', intermediate)
         final = ' '.join([m.group(0) for m in matches])
+        
+        
+        # Remove the characters between the strings
+        # matches = finditer('(?<=[\w])[-`=|!@#$%^&*+~,;\/\\_.\s]+(?=[\w])', final)
+        matches = finditer('[`=|!@#$%^*&+~,;_.-]', final)
+        intermediate = ' '.join([m.group(0) for m in matches])
+        for c in intermediate:
+            final = final.replace(c, ' ')
+
+        final = " ".join(final.split())
+        
+        
         return final
 
 
