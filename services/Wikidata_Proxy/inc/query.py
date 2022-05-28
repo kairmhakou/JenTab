@@ -115,11 +115,25 @@ class WDTimeoutError(Exception):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HELPER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-async def runQuerySingleKey(cache, entities, stmt, max_entity=10000, printIt=False):
+async def runQuerySingleKey(cache, entities, stmt, max_entity=10000, printIt=False, type=None):
     """
     generic query / cache function for queries that have a single key
     """
 
+    #  Remove the comma if it exists
+    print("entity before split", entities)
+    entity_isList = False
+    try:
+        if isinstance(entities[0], list):
+            entity_isList = True
+            entities = [entity.split(",") for entity in entities[0]]
+    except:
+        print('entity contains no list')
+    if not entity_isList:
+        entities = [entity.split(",") for entity in entities]
+    print("entity after split", entities)
+    
+    
     # replace any prefix, if present
     # and filter for unique values
     entities = map(getWikiID, entities)
@@ -140,8 +154,14 @@ async def runQuerySingleKey(cache, entities, stmt, max_entity=10000, printIt=Fal
     for chunk in chunks:
 
         # format base entities
-        valuelist = ' '.join(['wd:{}'.format(el['base']) for el in chunk])
+#         valuelist = ' '.join(['wd:{}'.format(el['base']) for el in chunk])
+        if not type:
+            valuelist = ' '.join(['wd:{}'.format(el['base']) for el in chunk])
+        else:
+            valuelist = ' '.join(['"{}"@en'.format(el['base']) for el in chunk])
 
+            
+        print("valueList", valuelist)
         # start request
         statement = stmt % valuelist
         if printIt:
