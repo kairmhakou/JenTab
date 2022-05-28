@@ -31,10 +31,14 @@ def __fix_object(list_values):
     if globalConfig.ENABLE_BIODIV_DICT:
         # special case for Biodiversity
         for i, val in enumerate(clean_lst):
-            if "species:" in val and "sub:" in val:
+#             if "species:" in val and "sub:" in val:
+              if ("species:" in val and "sub:" in val) or ("species:" in val) or ("sub:" in val) or (':' in val):
                 # parts = val.split(":")
-                parts = re.split(' |:|', val)
-                clean_lst[i] = parts[1] + ' ' + parts[3]
+#                 parts = re.split(' |:|', val)
+#                 clean_lst[i] = parts[1] + ' ' + parts[3]
+                    parts = re.split(r"[-:,/_\s]\s*", val)
+                    text = [x for i, x in enumerate(parts) if i % 2 != 0]
+                    clean_lst[i] = ' '.join(text for text in text)
 
         # convert Unknown words to None
         unknowns = ['unknown', 'undetermined', 'N/A', '?']
@@ -49,7 +53,9 @@ def __fix_object(list_values):
         separators = ['/', ' - ', '(']
         for i, val in enumerate(clean_lst):
             for sep in separators:
-                if val is not None and val.count(sep) == 1:
+#                 if val is not None and val.count(sep) == 1:
+                if val is not None and val.count(sep) >0:
+
                     clean_lst[i] = val.split(sep)[0]
                     # consider only one separator that might co-occur
                     break
@@ -63,16 +69,29 @@ def __fix_date(list_values):
     i.e., clean_cell = 2010-11-23 November 23, 2010
     res = 2010-11-23
     """
-    clean_lst = [util.find_date(val) for val in list_values]
+#     clean_lst = [util.find_date(val) for val in list_values]
+    clean_lst_test= [util.find_date(val, False) for val in list_values]
+    p = r'\d{1,2}/\d{1,2}/\d{4}'
+    for i in range(len(clean_lst_test)):
+        test =re.findall(p,  clean_lst_test[i])
+        if len(test) == 1:
+            clean_lst_test = [util.find_date(val, True) for val in list_values]
+            break
+    
+    clean_lst = clean_lst_test
+    
     return clean_lst
 
 
-def __fix_quantity(list_values):
+#def __fix_quantity(list_values):
+def __fix_quantity(header, list_values):
     clean_lst = [util.find_num(val) for val in list_values]
 
     if globalConfig.ENABLE_BIODIV_DICT:
         # fix month if the header says month and listing some numbers
-        if clean_lst[0].lower() == 'month':
+#         if clean_lst[0].lower() == 'month':
+        if header == 'month':
+            
             for i, val in enumerate(clean_lst):
                 if val.isdigit() and 12 >= int(val) >= 1:
                     clean_lst[i] = calendar.month_name[int(val)]
@@ -86,11 +105,13 @@ def fix_specific(list_values, col_type):
     list_values should be passed by fix_any phase.
     """
     if col_type == col_types.OBJECT or col_type == col_types.OTHER:
-        return __fix_object(list_values)
+        return __fix_object(header, list_values)
+#         return __fix_object(list_values)
     if col_type == col_types.DATE:
         return __fix_date(list_values)
     if col_type == col_types.QUANTITY:
-        return __fix_quantity(list_values)
+        return __fix_quantity(header, list_values)
+#         return __fix_quantity(list_values)
 
     # if nothing specified, then the general fixes is enough
     return list_values
