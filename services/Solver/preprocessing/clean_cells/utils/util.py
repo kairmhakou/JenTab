@@ -2,13 +2,14 @@ from ftfy import fix_text
 from ..config import normalization
 from date_detector import Parser as dParser
 import re
+import numpy as np
 
 # regexp to remove multiple whitespaces
 # https://stackoverflow.com/a/2077906/1169798
 _RE_COMBINE_WHITESPACE = re.compile(r"\s+")
 
 # init common objects
-dDetector = dParser()
+# dDetector = dParser()
 
 
 def decode(text):
@@ -38,7 +39,8 @@ def clean_data(lst):
     Removes artificial NaNs and noisy cells -
     Noisy cell contains only special chars.
     """
-    empty = ['nan', 'NaN']
+    #empty = ['nan', 'NaN']
+    empty = ['nan', 'NaN', 'Unknown Class','unknown class', np.nan, 'Not Available','not available', 'Unknown', 'unknown', 'Undetermined', 'undetermined', 'Unknown Species', 'unknown species', 'None', 'none', 'Other', 'other']
     res = []
     for cell in lst:
         if str(cell) in empty:
@@ -51,11 +53,14 @@ def clean_data(lst):
     return res
 
 
-def find_date(txt):
+def find_date(txt, month_day):
     """
     Find first date match in a given string, a string contains multiple dates, it will return the first one only
     Fixed format will also be returned YYY-MM-DD
     """
+    
+    dDetector = dParser(month_before_day=month_day)
+    
     clean = txt
     matches = dDetector.parse(txt)
     for m in matches:
