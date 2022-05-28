@@ -1,6 +1,16 @@
 from .generate_cea import generate as generate_cea
 from .generate_cta import generate as generate_cta
 
+#Karim
+from .k_generate_cea_biodiv import generate as k_generate_cea_biodiv
+from .k_generate_cta_biodiv import generate as k_generate_cta_biodiv
+from .k_filter_colHeader import doFilter as k_filter_colHeader
+from .k_filter_distanceCea import doFilter as k_filter_distanceCea
+from .k_select_cea import select as k_select_cea_cta
+from.k_filter_longLabel import doFilter as k_filter_longLabel
+from.k_select_cta_majority import select as k_select_cta_majority
+
+
 from .filter_colHeader import doFilter as filter_colHeader
 from .filter_distantCea import doFilter as filter_distantCea
 
@@ -38,23 +48,51 @@ class Pipeline():
         try:
 
             # initialize CEA candidates
+            '''
             generate_cea(self.pTable, self.proxyService)
             self.pTable.checkPoint.addCheckPoint('cea_initial', self.pTable, cta=True)
             res_IO.set_res(self.table_name, self.get_results())
-
+            '''
+            
+            k_generate_cea_biodiv(self.pTable, self.proxyService)
+            self.pTable.checkPoint.addCheckPoint('cea_initial', self.pTable, cta=True)
+            res_IO.set_res(self.table_name, self.get_results()
+            
+                           
+            k_filter_longLabel(self.pTable)
+                           
+                           
+            '''
             # infer column types for object-columns
             generate_cta(self.pTable, self.proxyService)
             self.pTable.checkPoint.addCheckPoint('cta_initial', self.pTable, cta=True)
             res_IO.set_res(self.table_name, self.get_results())
-
+            '''
+            k_generate_cta_biodiv(self.pTable,self.proxyService)
+            self.pTable.checkPoint.addCheckPoint('cta_initial', self.pTable, cta=True)
+            res_IO.set_res(self.table_name, self.get_results())
+                           
+            k_select_cta_majority(self.pTable, self.proxyService)
+                           
+            k_select_cea_cta(self.pTable,  proxyService= self.proxyService)
+                           
+            '''
             # filter CTA and CEA candidates by support
             filter_colHeader(self.pTable, minSupport=0.5)
             self.pTable.checkPoint.addCheckPoint('filter_colHeader', self.pTable, cta=True, cea=True)
             res_IO.set_res(self.table_name, self.get_results())
-
+            '''
+                           
+                           
+                           
+            
+                           
+                           
+            '''
             # intermediate: create cell pairs now that we have CEA candidates
             self.pTable.initCellPairs()
-
+            '''
+            '''
             # remove CEA candidates that are to string-distant from their cell values
             filter_distantCea(self.pTable)
             self.pTable.checkPoint.addCheckPoint('filter_distantCea', self.pTable, cea=True)
@@ -84,7 +122,9 @@ class Pipeline():
             else:
                 select_cta_majority(self.pTable, self.proxyService)
             # select_cpa_majority(self.pTable)
-
+            '''
+            
+            '''
             # final checkpoints
             self.pTable.checkPoint.addCheckPoint('final_cand', self.pTable, cea=True, cta=True, cpa=True)
             self.pTable.checkPoint.checkpointSelected('final_selected', self.pTable, cea=True, cta=True, cpa=True)
@@ -116,6 +156,9 @@ class Pipeline():
             # backup strategies of CTA selection (first call, higher priority
             select_cta_directParents(self.pTable, proxyService=self.proxyService)
             self.pTable.checkPoint.checkpointSelected('select_cta_directParents', self.pTable, cta=True)
+            
+            '''
+                           
             res_IO.set_res(self.table_name, self.get_results())
 
             # return pTable object
