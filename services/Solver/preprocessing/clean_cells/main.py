@@ -9,10 +9,12 @@ def fix_cell_lst(col_cells):
     return clean_cells
 
 
-def specific_clean_cell_lst(col_cells, col_type):
+#def specific_clean_cell_lst(col_cells, col_type):
+def specific_clean_cell_lst(col_header,col_cells, col_type):
     """Clean a list of cells - column cells"""
     # List of strings
-    clean_cells = fix_specific(col_cells, col_type)
+#     clean_cells = fix_specific(col_cells, col_type)
+    clean_cells = fix_specific(col_header, col_cells, col_type)
     return clean_cells
 
 
