@@ -20,7 +20,24 @@ class Wikidata_Proxy_Service(Service):
         # Lookup APIs
         self.look_for = API(self, self.root, "look_for", ["text", "dbo_class"], "POST")
         self.look_for_lst = API(self, self.root, "look_for_lst", ["texts", "dbo_col_class"], "POST")
-
+        
+        # More API's
+        self.get_entity_entitySearch_no_inTitle = API(self, self.root, "get_entity_entitySearch_no_inTitle", ["texts"], "POST")
+        self.get_entity_entitySearch_with_inTitle = API(self, self.root, "get_entity_entitySearch_with_inTitle", ["texts"],"POST") #NO
+        self.get_entity_Search_no_inLabel = API(self, self.root, "get_entity_Search_no_inLabel",["texts"], "POST")
+        self.get_entity_Generate_with_inTitle = API(self, self.root, "get_entity_Generate_with_inTitle",["texts"], "POST")
+        self.get_taxon= API(self, self.root, "get_taxon",["texts"],"POST")
+        self.get_type_subclass= API(self, self.root, "get_type_subclass",["texts"],"POST")
+        self.get_taxon_rank = API(self, self.root, "get_taxon_rank", ["entity"], "POST")
+        self.get_unit = API(self, self.root, "get_unit", ["entity"], "POST")
+        self.get_reserve_label = API(self, self.root,"get_reserve_label", ["entity", "lang"], "POST")
+        self.get_found_in_taxon = API(self, self.root, "get_found_in_taxon", ["entity", "lang"], "POST")
+        self.get_quantity = API(self, self.root, "get_quantity", ["entity"], "POST")
+        self.get_oxyanion= API (self, self.root, "get_oxyanion", ["entity"], "POST")
+        self.get_chemical_element= API (self, self.root, "get_chemical_element", ["entity"], "POST")
+        self.get_unit_of_measurement= API (self, self.root, "get_chemical_element", ["entity"], "POST")
+        
+        
         # Endpoint APIs
         self.get_type_for = API(self, self.root, "get_type_for", "text", "POST")
         self.get_type_for_lst = API(self, self.root, "get_type_for_lst", "texts", "POST")
