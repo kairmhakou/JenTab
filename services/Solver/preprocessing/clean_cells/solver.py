@@ -99,7 +99,7 @@ def __fix_quantity(header, list_values):
     return clean_lst
 
 
-def fix_specific(list_values, col_type):
+def fix_specific(header, list_values, col_type):
     """
     specific clean up for the following col_type
     list_values should be passed by fix_any phase.
