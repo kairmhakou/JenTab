@@ -12,7 +12,8 @@ from util import util_log
 util_log.init("Wikidata_Proxy.log")
 
 app = Quart(__name__)
-app.debug = False
+# app.debug = False
+app.debug = True
 
 
 @app.route('/test')
@@ -384,6 +385,113 @@ def handle_500(e):
     except:
         return traceback.format_exc(), 500
 
+    
+# ~~~~~~~~~~~~~~~~~~~Added by Karim~~~~~~~~~~~~~~~~~~~~
+@app.route('/get_entity_entitySearch_no_inTitle', methods=['POST'])
+async def routeGet_entity_entitySearch_no_inTitle():
+    print("get_entity_entitySearch_no_inTitle in main wikidata_proxy")
+    params = await request.json
+    res = await inc.k_api.get_entity_entitySearch_no_inTitle(params["texts"])
+    return res
+
+@app.route('/get_entity_entitySearch_with_inTitle', methods=['POST'])
+async def  routeGet_entity_entitySearch_with_inTitle():
+    print("get_entity_entitySearch_with_inTitle in main wikidata_proxy")
+    params = await request.json
+    res = await inc.k_api.get_entity_entitySearch_with_inTitle(params["texts"])
+    return res
+
+@app.route('/get_entity_Search_no_inLabel', methods=['POST'])
+async def  routeGet_entity_Search_no_inLabel():
+    print("get_entity_Search_no_inLabel in main wikidata_proxy")
+    params = await request.json
+    res = await inc.k_api.get_entity_Search_no_inLabel(params["texts"])
+    return res
+
+@app.route('/get_entity_Generate_with_inTitle', methods=['POST'])
+async def routeGet_entity_Generate_with_inTitle():
+    print("get_entity_Generate_with_inTitle in main wikidata_proxy")
+    params = await request.json
+    res = await inc.k_api.get_entity_Generate_with_inTitle(params["texts"])
+    return res
+
+@app.route('/get_taxon', methods=['POST'])
+async def routeGet_taxon():
+    print("get_taxon")
+    params = await request.json
+    res = await inc.k_api.get_taxon(params["texts"])
+    return res
+
+@app.route('/get_type_subclass', methods=['POST'])
+async def routeGet_type_subclass():
+    print("Get_type_subclass in main wikidata_proxy")
+    params = await request.json
+    res = await inc.k_api.get_type_subclass(params["texts"])
+    return res
+
+# @app.route('/get_taxon_rank', methods=['POST'])
+# async def routeGet_taxon_rank():
+#     print("get_taxon_rank in main wikidata_proxy")
+#     params = await request.json
+#     res = await inc.k_api.get_taxon_rank(params["texts"])
+#     return res
+
+@app.route('/get_taxon_rank', methods=['POST'])
+async def routeGet_taxon_rank():
+    print("get taxon rank")
+    params = await request.json
+    res = await inc.k_api.get_taxon_rank(params['entity'])
+    return res
+
+@app.route('/get_unit', methods=['POST'])
+async def routeGet_unit():
+    print("get_unit")
+    params = await request.json
+    res = await inc.k_api.get_unit(params['entity'])
+    return res
+
+@app.route('/get_reserve_label', methods=['POST'])
+async def routeGet_reserve_label():
+    print("get_reserve_label")
+    params = await request.json
+    res = await inc.k_api.get_reserve_label(params['entity'])
+    return res
+
+@app.route('/get_found_in_taxon', methods=['POST'])
+async def routeGet_found_in_taxon():
+    print("get_found_in_taxon")
+    params = await request.json
+    res = await inc.k_api.get_found_in_taxon(params['entity'])
+    return res
+
+@app.route('/get_quantity', methods=['POST'])
+async def routeGet_quantity():
+    print("get_quantity")
+    params = await request.json
+    res = await inc.k_api.get_quantity(params['entity'])
+    return res
+
+@app.route('/get_oxyanion', methods=['POST'])
+async def routeGet_oxyanion():
+    print("get_oxyanion")
+    params = await request.json
+    res = await inc.k_api.get_oxyanion(params['entity'])
+    return res
+
+@app.route('/get_chemical_element', methods=['POST'])
+async def routeGet_chemical_element():
+    print("get_chemical_element")
+    params = await request.json
+    res = await inc.k_api.get_chemical_element(params['entity'])
+    return res
+
+@app.route('/get_unit_of_measurement', methods=['POST'])
+async def routeGet_unit_of_measurement():
+    print("get_unit_of_measurement")
+    params = await request.json
+    res = await inc.k_api.get_unit_of_measurement(params['entity'])
+    return res
+#------------------------------------------------------------
 
 @app.route('/')
 def routeRoot():
