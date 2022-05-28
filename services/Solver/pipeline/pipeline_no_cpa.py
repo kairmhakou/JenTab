@@ -6,7 +6,7 @@ from .k_generate_cea_biodiv import generate as k_generate_cea_biodiv
 from .k_generate_cta_biodiv import generate as k_generate_cta_biodiv
 from .k_filter_colHeader import doFilter as k_filter_colHeader
 from .k_filter_distanceCea import doFilter as k_filter_distanceCea
-from .k_select_cea import select as k_select_cea_cta
+from .k_select_cea_cta import select as k_select_cea_cta
 from.k_filter_longLabel import doFilter as k_filter_longLabel
 from.k_select_cta_majority import select as k_select_cta_majority
 
