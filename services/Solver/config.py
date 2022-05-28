@@ -10,8 +10,8 @@ MAX_TOKENS = 5  # Tokens inside cells to be checked individually
 
 DBPEDIA = 1
 WIKIDATA = 2
-TARGET_KG = DBPEDIA
-# TARGET_KG = WIKIDATA
+# TARGET_KG = DBPEDIA
+TARGET_KG = WIKIDATA
 
 Wikidata_Prefix = 'http://www.wikidata.org/entity/'  # Used to shorten the full mappingd URIs
 Wikidata_Prop_Prefix = 'http://www.wikidata.org/prop/direct/'
@@ -43,7 +43,7 @@ AUDIT_ACTIVATED = True
 
 # deduce object columns from target definitions
 # if a column is part of CEA tasks, it has to be of type OBJECT no matter what the type detections says
-DEDUCE_FROM_TARGETS = True
+DEDUCE_FROM_TARGETS = False
 
 # Maximum (batch_size) instances we retrieve labels for...
 LABELS_FOR_BATCH_SIZE = 50000
@@ -80,18 +80,18 @@ ENABLE_PARTIAL_RES_SUBMISSION = True
 LCS_SELECT_CTA = True
 
 # Pipeline Mode
-# PIPELINE = 'pipeline_no_cpa' # used for BiodivTab
-PIPELINE = 'pipeline_full_small' #used for gittables
+PIPELINE = 'pipeline_no_cpa' # used for BiodivTab
+# PIPELINE = 'pipeline_full_small' #used for gittables
 # PIPELINE = 'pipeline_conditional'
 
 # True will include all cell lookup strategies, Generic_Lookup otherwise.
-ALL_STRATEGIES = True
+ALL_STRATEGIES = False
 
 # This flag is used to force selection of one CTA or select multiple
 ONE_CTA = True
 
 # Dataset for Biodiversity (BiodivTab) This enables further cleaning steps in the preprocess and biodiv_lookup strategy
-ENABLE_BIODIV_DICT = False
+ENABLE_BIODIV_DICT = True
 
 # Enables the generic_lookup strategy, all datasets use it except BiodivTab
-ENABLE_GENERIC_LOOKUP = True
+ENABLE_GENERIC_LOOKUP = False
