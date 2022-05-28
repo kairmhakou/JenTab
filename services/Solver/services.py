@@ -6,7 +6,8 @@ import json
 import itertools
 
 # maximum number of retries to the service
-MAX_RETRIES = 5
+# MAX_RETRIES = 5
+MAX_RETRIES = 10
 # number of parameters send in a single query
 QUERY_BATCH_SIZE = 250000
 
