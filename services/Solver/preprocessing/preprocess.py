@@ -40,6 +40,9 @@ def prepareData(work):
     for col in result['data']:
         # init clean_cell_vals holder
         col['clean_cell_vals'] = []
+        
+        #get the header of the column
+        column_header = col['original_cell_vals'][0]
 
         # temp holder for col['original_cell_vals']
         fixed_original = []
@@ -47,7 +50,10 @@ def prepareData(work):
         # start the batch processing of generic fixes...
         for b_original_cell_vals in get_batch(col['original_cell_vals'], config.BATCH_SIZE):
             # encoding fix + data cleaning + generic Parsing for "all"
-            clean_res = CleanCells.fix_cell_lst(b_original_cell_vals)
+            
+            clean_res = CleanCells.specific_clean_cell_lst(column_header, b_vals, col['type'])
+#             clean_res = CleanCells.fix_cell_lst(b_original_cell_vals)
+            
 
             # data cleaned + encoding fix + parsing
             col['clean_cell_vals'].extend(clean_res['clean'])
