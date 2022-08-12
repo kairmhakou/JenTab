@@ -80,7 +80,9 @@ ENABLE_PARTIAL_RES_SUBMISSION = True
 LCS_SELECT_CTA = True
 
 # Pipeline Mode
-PIPELINE = 'pipeline_no_cpa' # used for BiodivTab
+# PIPELINE = 'pipeline_no_cpa' # used for BiodivTab
+PIPELINE = 'k_pipeline_no_cpa' # used for BiodivTab
+
 # PIPELINE = 'pipeline_full_small' #used for gittables
 # PIPELINE = 'pipeline_conditional'
 
