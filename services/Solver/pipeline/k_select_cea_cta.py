@@ -69,7 +69,7 @@ def select(pTable, purged=False,proxyService=None , minSupport=0.5):
                     continue
                 cell['sel_cand'] = {'uri':best_cand['uri'][0],
                                         'labels': best_cand['labels']}
-                # check if there is a taxon QID
+                # check if there is a taxon QID, specific for BIODIVTAB DATASET
                 if best_cand['types'][0] == TAXON_QID:
                     res = proxyService.get_taxon_rank.send([best_cand['uri']])
                     if len(res[best_cand['uri'][0]]):
@@ -108,7 +108,7 @@ def select(pTable, purged=False,proxyService=None , minSupport=0.5):
                 break
 
     # TODO KARIM
-    # get all the columns with type QUANTITY
+    # get all the columns with type QUANTITY, specific for BIODIVTAB DATASET
     cols = [col for col in pTable.getTargets(cta=True) if col['type'] == 'QUANTITY' or col['cand'] == [] or col['sel_cand'] is None]
     for col in cols:
         # 1- if the header is from a taxonic_rank of sub class start with the taxon
