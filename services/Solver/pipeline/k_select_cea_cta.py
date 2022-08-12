@@ -34,57 +34,39 @@ def select(pTable, purged=False,proxyService=None , minSupport=0.5):
     ties are broken by popularity, i.e. the entity with the most incoming links
     can be executed either on the remaining candidates or the purged candidates
     """
-    print("select_cea_stringSimilarity")
-
-    # table cols
-    # cols = pTable.getCols(unsolved=True)
+    print("select_cea_cta")
     cols = pTable.getTargets(cta=True)
 
 
     for col in cols:
 
         # check, if we have to process this column at all
-        # if not pTable.isTarget(col_id=col['col_id']):
-        #     continue
         if col['type'] == "QUANTITY" or col['cand'] == []:
             continue
         cells = pTable.getCells(col_id=col['col_id'])
-
-        # header_cand = header_cell[0]['cand']
-        # for cand_h in header_cand:
-        #     for type in cand_h['types']:
-        #         if type == TAXON_RANK_QID:
-        #             taxon_rank = True
-        #             break
-        #     if taxon_rank:
-        #         break
-
-        rankcc = {}
+        
         #select the best candidate, cells of one column
-        #go through all the cells
+        rankcc = {}
         for cell in cells:
             if cell['row_id'] != 0 and cell['clean_val']:
                 best_cand=__jaccard_similarity_full(cell['cand'],cell['clean_val'])
                 if not best_cand:
                     continue
                 cell['sel_cand'] = {'uri':best_cand['uri'][0],
-                                        'labels': best_cand['labels']}
+                                    'labels': best_cand['labels']}
                 # check if there is a taxon QID, specific for BIODIVTAB DATASET
                 if best_cand['types'][0] == TAXON_QID:
                     res = proxyService.get_taxon_rank.send([best_cand['uri']])
                     if len(res[best_cand['uri'][0]]):
                         for itemKey, rankVals in res.items():
                             for rankval in rankVals:
-                                ##add here
                                 cell['sel_cand'].update(
                                     {'rank': rankval['rank'], 'rankLabel': rankval['rankLabel']})
                                 if rankval['rank'] in rankcc:
                                     rankcc[rankval['rank']] += 1
                                 else:
                                     rankcc.update({rankval['rank']: 1})
-                                # r_qid.append(rankval['rank'])
-                                # rank_label_list.append(rankval['rankLabel'])
-                                # ll.append({'labels': rankval['rankLabel'], 'uri': rankval['rank'], 'count': 1})
+                                
                 #no rank
                 else:
                     if cell['sel_cand']['uri'] in rankcc:
@@ -100,19 +82,18 @@ def select(pTable, purged=False,proxyService=None , minSupport=0.5):
 
         #check if the freq type/rank between header candidates
         header = pTable.getCell(col['col_id'], 0)
-        #if header['cand'] is empty
+      
+        
         for h_cand in header['cand']:
             if freq_rank in h_cand['uri']:
                 header['sel_cand'] = {'uri': h_cand['uri'][0], 'labels': h_cand['labels']}
                 col['sel_cand'] =  {'uri': h_cand['uri'][0], 'labels': h_cand['labels']}
                 break
 
-    # TODO KARIM
+    
     # get all the columns with type QUANTITY, specific for BIODIVTAB DATASET
     cols = [col for col in pTable.getTargets(cta=True) if col['type'] == 'QUANTITY' or col['cand'] == [] or col['sel_cand'] is None]
     for col in cols:
-        # 1- if the header is from a taxonic_rank of sub class start with the taxon
-        # header_cell = pTable.getCells(row_id=0, col_id=col['col_id'])
         temp_sel_cand = {}
         header_cell = pTable.getCell(col['col_id'], 0)
         if header_cell['cand'] == []:
@@ -157,70 +138,72 @@ def select(pTable, purged=False,proxyService=None , minSupport=0.5):
 
             # the last step jaccard similarty and the most number of labels which means that this the most popular
 
-
+        if temp_sel_cand == {}:
+            match = __jaccard_similarity_full(header_cell['cand'], header_cell['clean_val'])
+            temp_sel_cand = {'uri': match['uri'][0], 'labels': match['labels']}
         header_cell['sel_cand'] = temp_sel_cand
         col['sel_cand'] = temp_sel_cand
 
 
-    get all the unsolved cols
-    cols = [col for  col in pTable.getCols(unsolved=True)]
+#     get all the unsolved cols
+#     cols = [col for  col in pTable.getCols(unsolved=True)]
 
-    # get all object cells
-    cells = [cell for cell in pTable.getCells(unsolved=True, onlyObj=True)]
+#     # get all object cells
+#     cells = [cell for cell in pTable.getCells(unsolved=True, onlyObj=True)]
     
-    # [Audit] How many cells should be solved a.k.a must have sel_cand
-    target_cells_cnt = len(cells)
+#     # [Audit] How many cells should be solved a.k.a must have sel_cand
+#     target_cells_cnt = len(cells)
     
-    # [Audit] unsolved cells a.k. cells with no sel_cand
-    remaining = []
+#     # [Audit] unsolved cells a.k. cells with no sel_cand
+#     remaining = []
     
-    # [Audit] How many cells with modified sel_cand by this method
-    solved_cnt = 0
+#     # [Audit] How many cells with modified sel_cand by this method
+#     solved_cnt = 0
     
-    # get the selected candidate
-    for cell in cells:
+#     # get the selected candidate
+#     for cell in cells:
     
-        # select the candidates to consider
-        if purged:
-            cands = cell['purged_cand']
-        else:
-            cands = cell['cand']
+#         # select the candidates to consider
+#         if purged:
+#             cands = cell['purged_cand']
+#         else:
+#             cands = cell['cand']
     
-        # skip cells without candidates
-        if not cands:
-            # [Audit] cells with no candidates are still remaining!
-            remaining.extend([cell])
-            continue
+#         # skip cells without candidates
+#         if not cands:
+#             # [Audit] cells with no candidates are still remaining!
+#             remaining.extend([cell])
+#             continue
     
-        # if there is only one candidate, we select that one
-        if len(cands) == 1:
-            cell['sel_cand'] = {'uri':cands[0]['uri'][0], 'label':cands[0]['labels'][0]}
-            # [Audit] special case solution
-            solved_cnt = solved_cnt + 1
-            if purged:
-                cell['cand'] = [cell['sel_cand']]
-            continue
+#         # if there is only one candidate, we select that one
+#         if len(cands) == 1:
+#             cell['sel_cand'] = {'uri':cands[0]['uri'][0], 'label':cands[0]['labels'][0]}
+#             # [Audit] special case solution
+#             solved_cnt = solved_cnt + 1
+#             if purged:
+#                 cell['cand'] = [cell['sel_cand']]
+#             continue
     
-        # for all others check the string similarity
-        # best_match = get_most_similar(cands, cell['value'], proxyService)
-        best_match = get_most_similar(cands, cell['clean_val'], proxyService)
+#         # for all others check the string similarity
+#         # best_match = get_most_similar(cands, cell['value'], proxyService)
+#         best_match = get_most_similar(cands, cell['clean_val'], proxyService)
     
-        # add match to candidate
-        cell['sel_cand'] = {'uri':best_match['uri'][0], 'labels':best_match['labels'],'types':best_match['types'][0]}
+#         # add match to candidate
+#         cell['sel_cand'] = {'uri':best_match['uri'][0], 'labels':best_match['labels'],'types':best_match['types'][0]}
     
-        # [Audit] if change detected then count as solved otherwise, add to remaining
-        solved_cnt = solved_cnt + 1
+#         # [Audit] if change detected then count as solved otherwise, add to remaining
+#         solved_cnt = solved_cnt + 1
     
-        if purged:
-            cell['cand'] = [cell['sel_cand']]
+#         if purged:
+#             cell['cand'] = [cell['sel_cand']]
 
-    [Audit] calculate remaining cnt
-    remaining_cnt = target_cells_cnt - solved_cnt
+#     [Audit] calculate remaining cnt
+#     remaining_cnt = target_cells_cnt - solved_cnt
     
-    # [Audit] get important keys only
-    remaining = [pTable.audit.getSubDict(cell, ['value', 'clean_val', 'row_id', 'col_id'])
-                 for cell in remaining]
+#     # [Audit] get important keys only
+#     remaining = [pTable.audit.getSubDict(cell, ['value', 'clean_val', 'row_id', 'col_id'])
+#                  for cell in remaining]
     
-    # [Audit] add audit record
-    pTable.audit.addRecord(tasks.CEA, steps.selection,
-                           methods.stringSimilarity, solved_cnt, remaining_cnt, remaining)
+#     # [Audit] add audit record
+#     pTable.audit.addRecord(tasks.CEA, steps.selection,
+#                            methods.stringSimilarity, solved_cnt, remaining_cnt, remaining)
