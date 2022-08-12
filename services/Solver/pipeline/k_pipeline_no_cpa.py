@@ -51,10 +51,10 @@ class Pipeline():
             res_IO.set_res(self.table_name, self.get_results()) #no error
 
 
-            # select CTA candidates
+            # select CTA candidate
             k_select_cta_majority(self.pTable, self.proxyService)
 
-            # select CEA & CTA candidates
+            # select CEA & CTA candidate (specific CTA methods for BIODIVTAB DATASET) 
             k_select_cea_cta(self.pTable,  proxyService= self.proxyService) #this will choose the taxon
 
 
