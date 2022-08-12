@@ -24,9 +24,6 @@ def select(pTable, proxyService):
     remaining = []
 
     for col in cols:
-
-        # default cases: there is no choice
-        #TODO KARIM ADD (or col['type']== "QUANTITY")
         if not col['cand'] or col['type']=="QUANTITY":
             # [Audit] cols with no candidates are still remaining
             remaining.extend([col])
@@ -59,7 +56,6 @@ def select(pTable, proxyService):
             solved_cnt = solved_cnt + 1
             col['sel_cand'] = cands[0]
         else:
-            #TODO KARIM add the types of the same support to the sel_cands
             col['sel_cands'] = cands
             # [Audit] if no clear winner, then it still remaining
 
