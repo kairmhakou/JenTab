@@ -1,12 +1,10 @@
 
-from .generate_cta import generate as generate_cta
-#TODO KARIM
 from .k_generate_cea_biodiv import generate as k_generate_cea_biodiv
 from .k_generate_cta_biodiv import generate as k_generate_cta_biodiv
 from .k_select_cea import select as k_select_cea_cta
 from.k_filter_longLabel import doFilter as k_filter_longLabel
 from.k_select_cta_majority import select as k_select_cta_majority
-#TODO UNTIL HERE
+
 
 
 from external_services.wikidata_proxy_service import Wikidata_Proxy_Service
