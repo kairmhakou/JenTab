@@ -23,7 +23,10 @@ def __jaccard_similarity_full(can, src):
             if score > best_match_score:
                 best_match_score = score
                 best_cand = c
-
+        #the best candidate is found
+        if score == 1:
+            break
+           
     return  best_cand
 
 
@@ -47,6 +50,7 @@ def select(pTable, purged=False,proxyService=None , minSupport=0.5):
         
         #select the best candidate, cells of one column
         rankcc = {}
+        types_uris_cache={}
         for cell in cells:
             if cell['row_id'] != 0 and cell['clean_val']:
                 best_cand=__jaccard_similarity_full(cell['cand'],cell['clean_val'])
@@ -56,7 +60,13 @@ def select(pTable, purged=False,proxyService=None , minSupport=0.5):
                                     'labels': best_cand['labels']}
                 # check if there is a taxon QID, specific for BIODIVTAB DATASET
                 if best_cand['types'][0] == TAXON_QID:
-                    res = proxyService.get_taxon_rank.send([best_cand['uri']])
+                    #check the cache variable
+                    if best_cand['uri'][0] in types_uris_cache:
+                        res= {best_cand['uri'][0]: types_uris_cache[best_cand['uri'][0]]}
+                    else:
+                        res = proxyService.get_taxon_rank.send([best_cand['uri']])
+                        types_uris_cache.update(res)
+                        
                     if len(res[best_cand['uri'][0]]):
                         for itemKey, rankVals in res.items():
                             for rankval in rankVals:
@@ -94,47 +104,53 @@ def select(pTable, purged=False,proxyService=None , minSupport=0.5):
     # get all the columns with type QUANTITY, specific for BIODIVTAB DATASET
     cols = [col for col in pTable.getTargets(cta=True) if col['type'] == 'QUANTITY' or col['cand'] == [] or col['sel_cand'] is None]
     for col in cols:
+        
         temp_sel_cand = {}
+        
         header_cell = pTable.getCell(col['col_id'], 0)
+        
         if header_cell['cand'] == []:
             continue
-        for header_cand in header_cell['cand']:
-            # check if chemical_element between the candidates
-            try:
-                res_chemical_element = proxyService.get_chemical_element.send([header_cand['uri']])
-                if len(res_chemical_element[header_cand['uri'][0]]):
-                    temp_sel_cand = {'uri': header_cand['uri'][
-                        0], 'labels': header_cand['labels']}
-                    break
-            except:
-                print('error chemical_element')
+        
+        #only QUANTITY type columns
+        if col['type'] == 'QUANTITY':
+            for header_cand in header_cell['cand']:
+                # check if chemical_element between the candidates
+                try:
+                    res_chemical_element = proxyService.get_chemical_element.send([header_cand['uri']])
+                    if len(res_chemical_element[header_cand['uri'][0]]):
+                        temp_sel_cand = {'uri': header_cand['uri'][
+                            0], 'labels': header_cand['labels']}
+                        break
+                except:
+                    print('error chemical_element')
 
-            # check if oxyanion between the candidates
-            try:
-                res_oxyanion = proxyService.get_oxyanion.send([header_cand['uri']])
-                if len(res_oxyanion[header_cand['uri'][0]]):
-                    temp_sel_cand = {'uri': header_cand['uri'][0], 'labels': header_cand['labels']}
-                    break
-            except:
-                print('error get oxyanion')
+                # check if oxyanion between the candidates
+                try:
+                    res_oxyanion = proxyService.get_oxyanion.send([header_cand['uri']])
+                    if len(res_oxyanion[header_cand['uri'][0]]):
+                        temp_sel_cand = {'uri': header_cand['uri'][0], 'labels': header_cand['labels']}
+                        break
+                except:
+                    print('error get oxyanion')
 
-            # check if quantity between the candidates
-            try:
-                res_quantity = proxyService.get_quantity.send([header_cand['uri']])
-                if len(res_quantity[header_cand['uri'][0]]):
-                    temp_sel_cand = {'uri': header_cand['uri'][0], 'labels': header_cand['labels']}
-                    break
-            except:
-                print('error get quantity')
+                # check if quantity between the candidates
+                try:
+                    res_quantity = proxyService.get_quantity.send([header_cand['uri']])
+                    if len(res_quantity[header_cand['uri'][0]]):
+                        temp_sel_cand = {'uri': header_cand['uri'][0], 'labels': header_cand['labels']}
+                        break
+                except:
+                    print('error get quantity')
 
-            try:
+                try:
 
-                res_unit_of_measurement = proxyService.get_unit_of_measurement.send([header_cand['uri']])
-                if len(res_unit_of_measurement[header_cand['uri'][0]]):
-                    temp_sel_cand = {'uri': header_cand['uri'][0], 'labels': header_cand['labels']}
-                    break
-            except:
-                print("error unit of measurement")
+                    res_unit_of_measurement = proxyService.get_unit_of_measurement.send([header_cand['uri']])
+                    if len(res_unit_of_measurement[header_cand['uri'][0]]):
+                        temp_sel_cand = {'uri': header_cand['uri'][0], 'labels': header_cand['labels']}
+                        break
+                except:
+                    print("error unit of measurement")
 
             # the last step jaccard similarty and the most number of labels which means that this the most popular
 
